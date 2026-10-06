@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0b6b57">
+  <meta name="description" content="PivotCalc - حاسبة البيفوت الزراعي ومعادلة بيرو">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="PivotCalc">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="stylesheet" href="style.css">
+  <title>PivotCalc</title>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand-lockup">
+        <img src="logo.png" class="app-logo" alt="PivotCalc">
+        <div>
+          <div class="app-name">PivotCalc</div>
+          <div class="app-tagline" data-i18n="tagline">حاسبة البيفوت الزراعي</div>
+        </div>
+      </div>
+      <div class="top-actions">
+        <button class="icon-btn" id="ideaBtn" title="فكرة البرنامج" data-i18n-title="idea">💡</button>
+        <button class="icon-btn" id="verseBtn" title="آية" data-i18n-title="verse">﷽</button>
+        <button class="icon-btn" id="aboutBtn" title="تعريف بالتطبيق" data-i18n-title="about">ⓘ</button>
+        <button class="icon-btn" id="themeBtn" title="الوضع الداكن" data-i18n-title="theme">🌙</button>
+        <button class="icon-btn lang-btn" id="langBtn" title="English">EN</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-text">
+          <span class="eyebrow" data-i18n="eyebrow">CENTER PIVOT</span>
+          <h1 data-i18n="mainTitle">حاسبة مساحة البيفوت ومعدلات الزراعة والحصاد</h1>
+          <p data-i18n="heroDesc">حسابات دقيقة وتفاعلية مبنية على المعادلات الموجودة في ملف Excel المرجعي، مع دعم العمل دون اتصال.</p>
+        </div>
+        <div class="hero-install-row">
+          <div class="status-pill"><span class="status-dot"></span><span data-i18n="offlineReady">جاهز للعمل أوفلاين</span></div>
+          <button class="btn install-btn" id="installBtn">📲 <span data-i18n="installApp">تثبيت التطبيق</span></button>
+        </div>
+      </section>
+
+      <nav class="tabs" role="tablist">
+        <button class="tab active" data-tab="areaTab" role="tab" aria-selected="true" data-i18n="tabArea">حساب المساحة</button>
+        <button class="tab" data-tab="plantTab" role="tab" aria-selected="false" data-i18n="tabPlant">معدل الزراعة</button>
+        <button class="tab" data-tab="harvestTab" role="tab" aria-selected="false" data-i18n="tabHarvest">معدل الحصاد</button>
+        <button class="tab" data-tab="needsTab" role="tab" aria-selected="false" data-i18n="tabNeeds">احتياجات الزراعة والحصاد</button>
+      </nav>
+
+      <!-- AREA TAB -->
+      <section id="areaTab" class="tab-panel active" role="tabpanel">
+        <article class="card mobile-card">
+          <div class="section-head">
+            <div>
+              <span class="section-kicker" data-i18n="inputsKicker">بيانات أساسية</span>
+              <h2 data-i18n="pivotInputs">بيانات البيفوت</h2>
+            </div>
+            <span class="section-icon">◉</span>
+          </div>
+          <div class="form-grid-compact">
+            <div class="form-group">
+              <label for="pivotArea" data-i18n="pivotArea">مساحة البيفوت (فدان)</label>
+              <input id="pivotArea" class="big-input" type="number" min="0.01" step="0.01" value="125" inputmode="decimal">
+            </div>
+            <div class="form-group">
+              <label for="brandSelect" data-i18n="brand">ماركة البيفوت</label>
+              <select id="brandSelect"></select>
+              <div id="savedBrandTools" class="saved-brand-tools" aria-live="polite"></div>
+            </div>
+            <div class="form-group">
+              <label for="spanWidth" data-i18n="spanWidth">عرض الجرة (متر)</label>
+              <input id="spanWidth" type="number" min="0.01" step="0.01" value="1.8" inputmode="decimal">
+            </div>
+          </div>
+          <div class="quick-actions main-save-actions">
+            <button class="btn save-btn" id="saveDesignBtn">💾 <span data-i18n="saveDesign">حفظ التصميم</span></button>
+          </div>
+        </article>
+
+        <!-- TABLE 1: SUMMARY -->
+        <article class="card table-card">
+          <div class="section-head compact-head">
+            <div><span class="section-kicker">01</span><h2 data-i18n="summaryTable">ملخص الحساب</h2></div>
+            <span class="section-icon">▤</span>
+          </div>
+          <div class="table-wrap mobile-table-wrap">
+            <table class="data-table summary-table">
+              <thead><tr>
+                <th data-i18n="radius">نصف القطر</th>
+                <th data-i18n="totalTracks">إجمالي الجرر</th>
+                <th data-i18n="tracksPerWheel">جرر/عجلة</th>
+                <th data-i18n="activeWheels">العجلات</th>
+                <th data-i18n="pivotAreaResult">التوتال</th>
+              </tr></thead>
+              <tbody><tr>
+                <td id="radiusOut">—</td>
+                <td id="totalTracksOut">—</td>
+                <td id="tracksPerWheelOut">—</td>
+                <td id="activeWheelsOut">—</td>
+                <td id="totalAreaOut">—</td>
+              </tr></tbody>
+            </table>
+          </div>
+          <div class="summary-note">
+            <span><strong data-i18n="halfArea">مساحة نصف البيفوت</strong>: <b id="halfAreaOut">—</b> فدان</span>
+            <span><strong data-i18n="towerLength">طول البرج</strong>: <b id="towerLengthOut">—</b> م</span>
+          </div>
+        </article>
+
+        <!-- TABLE 2: EDITABLE TRACKS -->
+        <article class="card table-card">
+          <div class="section-head compact-head">
+            <div><span class="section-kicker">02</span><h2 data-i18n="editableTracksTitle">توزيع الجرر — قابل للتعديل</h2></div>
+            <span class="edit-badge" data-i18n="editable">تعديل مباشر</span>
+          </div>
+          <div class="edit-help" data-i18n="editTracksHint">امسح أي خلية واكتب عدد الجرر الذي تريده. الحساب والمساحة يتحدثان فورًا.</div>
+          <div class="table-near-actions">
+            <button class="btn primary table-action" id="autoFillBtn">⚡ <span data-i18n="autoFill">ملء تلقائي</span></button>
+            <button class="btn ghost table-action" id="clearAreaBtn">🗑 <span data-i18n="clear">مسح الجرر</span></button>
+          </div>
+          <div class="table-wrap mobile-table-wrap">
+            <table class="data-table editable-table">
+              <thead><tr>
+                <th data-i18n="wheelNo">العجلة</th>
+                <th data-i18n="tracksNo">عدد الجرر</th>
+                <th data-i18n="wheelArea">المساحة (فدان)</th>
+              </tr></thead>
+              <tbody id="wheelTableBody"></tbody>
+              <tfoot><tr class="grand-total-row">
+                <td data-i18n="tableTotal">التوتال</td>
+                <td><span class="total-focus" id="sumTracks">—</span></td>
+                <td><span class="total-focus" id="sumHalfArea">—</span></td>
+              </tr></tfoot>
+            </table>
+          </div>
+          <div class="note-box"><span>ℹ️</span><span data-i18n="areaNote">المساحات محسوبة لنصف البيفوت وفق معادلة بيرو في ملف Excel المرجعي، والتوتال الكامل يساوي المساحة المدخلة.</span></div>
+        </article>
+
+        <!-- TABLE 3: SAVED DESIGNS -->
+        <article class="card table-card">
+          <div class="section-head compact-head">
+            <div><span class="section-kicker">03</span><h2 data-i18n="savedDesignsTitle">التصميمات المحفوظة</h2></div>
+            <span class="section-icon">💾</span>
+          </div>
+          <div class="save-design-box">
+            <label for="designName" data-i18n="designName">اسم التصميم</label>
+            <div class="save-row">
+              <input id="designName" type="text" maxlength="60" placeholder="مثال: بيفوت 125 فدان - قطاع 1">
+              <button class="btn primary" id="saveDesignBtn2">💾 <span data-i18n="save">حفظ</span></button>
+              <button class="btn ghost" id="newDesignBtn">＋ <span data-i18n="newDesign">تصميم جديد</span></button>
+            </div>
+            <small id="editingDesignLabel" class="editing-label"></small>
+          </div>
+          <div class="saved-designs-list" id="savedDesignsList"></div>
+        </article>
+
+        <article class="card formula-box mobile-card">
+          <strong data-i18n="biroTitle">معادلة بيرو المستخدمة</strong>
+          <code>A(r) = (2 × θ × A<sub>pivot</sub> / 360) + (G × d / 4200)</code>
+          <span data-i18n="formulaNote">حيث θ = asin(d / R)، والمساحات المتتابعة = المساحة التراكمية الحالية − السابقة.</span>
+        </article>
+      </section>
+
+      <!-- PLANTING -->
+      <section id="plantTab" class="tab-panel" role="tabpanel">
+        <div class="grid-2">
+          <article class="card">
+            <div class="section-head">
+              <div><span class="section-kicker" data-i18n="manualInputs">مدخلات يدوية</span><h2 data-i18n="plantRateTitle">معدل الزراعة</h2></div>
+              <span class="section-icon">🌱</span>
+            </div>
+            <div class="form-group">
+              <label for="avgJumboWeight" data-i18n="avgJumboWeight">متوسط وزن الجامبو (طن)</label>
+              <input id="avgJumboWeight" type="number" min="0" step="0.001" placeholder="مثال: 1.960">
+            </div>
+            <div class="form-group">
+              <label for="totalJumbos" data-i18n="totalJumbos">إجمالي عدد الجامبوهات</label>
+              <input id="totalJumbos" type="number" min="0" step="1" placeholder="0">
+            </div>
+            <div class="persistent-note" data-i18n="persistentInputs">هذه المدخلات لا تُمسح عند إعادة حساب مساحة البيفوت.</div>
+          </article>
+          <article class="card">
+            <div class="section-head">
+              <div><span class="section-kicker" data-i18n="outputs">المخرجات</span><h2 data-i18n="plantResults">نتائج الزراعة</h2></div>
+              <span class="section-icon">📈</span>
+            </div>
+            <div class="big-result">
+              <span data-i18n="seedQty">إجمالي كمية التقاوي المنزرعة</span>
+              <strong id="seedQtyOut">—</strong><small data-i18n="ton">طن</small>
+            </div>
+            <div class="big-result">
+              <span data-i18n="plantRate">معدل الزراعة</span>
+              <strong id="plantRateOut">—</strong><small data-i18n="tonFeddan">طن/فدان</small>
+            </div>
+            <div class="source-mini"><span data-i18n="usesArea">يعتمد تلقائيًا على إجمالي مساحة البيفوت من التبويب الأول.</span></div>
+          </article>
+        </div>
+      </section>
+
+      <!-- HARVEST -->
+      <section id="harvestTab" class="tab-panel" role="tabpanel">
+        <div class="center-card card">
+          <div class="section-head">
+            <div><span class="section-kicker" data-i18n="harvestBox">الحاصد</span><h2 data-i18n="harvestRateTitle">معدل الحصاد</h2></div>
+            <span class="section-icon">🌾</span>
+          </div>
+          <div class="form-group">
+            <label for="harvestedJumbos" data-i18n="harvestedJumbos">عدد الجامبوهات المحصودة</label>
+            <input id="harvestedJumbos" type="number" min="0" step="1" placeholder="0">
+          </div>
+          <div class="harvest-result">
+            <span data-i18n="harvestRate">معدل الحصاد</span>
+            <strong id="harvestRateOut">—</strong>
+            <small data-i18n="jumboFeddan">جامبو/فدان</small>
+          </div>
+        </div>
+      </section>
+
+      <!-- NEEDS -->
+      <section id="needsTab" class="tab-panel" role="tabpanel">
+        <div class="grid-2">
+          <article class="card">
+            <div class="section-head">
+              <div><span class="section-kicker" data-i18n="needsPlant">احتياجات الزراعة</span><h2 data-i18n="plantNeedsTitle">حساب احتياجات الزراعة</h2></div>
+              <span class="section-icon">🌱</span>
+            </div>
+            <div class="form-group">
+              <label for="needWeight" data-i18n="avgWeightTon">متوسط وزن الجامبو (طن)</label>
+              <input id="needWeight" type="number" min="0" step="0.001" placeholder="1.960">
+            </div>
+            <div class="form-group">
+              <label for="needArea" data-i18n="areaFeddan">المساحة (فدان)</label>
+              <input id="needArea" type="number" min="0" step="0.01" placeholder="125">
+            </div>
+            <div class="form-group">
+              <label for="needPlantRate" data-i18n="plantRateTonFeddan">معدل الزراعة (طن/فدان)</label>
+              <input id="needPlantRate" type="number" min="0" step="0.001" placeholder="0">
+            </div>
+            <div class="output-list">
+              <div><span data-i18n="jumbosForArea">عدد الجامبوهات للمساحة</span><strong id="needPlantJumbos">—</strong></div>
+              <div><span data-i18n="quantityTon">الكمية</span><strong id="needPlantTons">— طن</strong></div>
+            </div>
+          </article>
+
+          <article class="card">
+            <div class="section-head">
+              <div><span class="section-kicker" data-i18n="needsHarvest">احتياجات الحصاد</span><h2 data-i18n="harvestNeedsTitle">حساب احتياجات الحصاد</h2></div>
+              <span class="section-icon">🚚</span>
+            </div>
+            <div class="form-group">
+              <label for="needHarvestRateTon" data-i18n="harvestRateTonInput">معدل الحصاد (طن/فدان)</label>
+              <input id="needHarvestRateTon" type="number" min="0" step="0.001" inputmode="decimal" placeholder="مثال: 2.5">
+            </div>
+            <div class="form-group">
+              <label for="needHarvestWeight" data-i18n="harvestJumboWeight">متوسط وزن الجامبو (طن)</label>
+              <input id="needHarvestWeight" type="number" min="0" step="0.001" inputmode="decimal" placeholder="مثال: 1.960">
+            </div>
+            <div class="form-group">
+              <label for="harvestTargetMode" data-i18n="harvestTargetMode">طريقة تحديد المطلوب</label>
+              <select id="harvestTargetMode">
+                <option value="jumbos" data-i18n="targetJumbos">عدد الجامبوهات</option>
+                <option value="trucks" data-i18n="targetTrucks">عدد العربيات</option>
+              </select>
+            </div>
+            <div class="form-group" id="targetJumbosGroup">
+              <label for="targetHarvestJumbos" data-i18n="targetHarvestJumbos">الجامبوهات المطلوبة</label>
+              <input id="targetHarvestJumbos" type="number" min="0" step="1" inputmode="numeric" placeholder="مثال: 200">
+            </div>
+            <div class="form-group hidden" id="targetTrucksGroup">
+              <label for="targetHarvestTrucks" data-i18n="targetHarvestTrucks">عدد العربيات المطلوبة</label>
+              <input id="targetHarvestTrucks" type="number" min="0" step="1" inputmode="numeric" placeholder="مثال: 10">
+            </div>
+            <div class="form-group hidden" id="truckCapacityGroup">
+              <label for="truckCapacity" data-i18n="truckCapacity">حمولة العربية (جامبو)</label>
+              <input id="truckCapacity" type="number" min="0" step="1" inputmode="numeric" placeholder="مثال: 20">
+            </div>
+            <div class="output-list harvest-needs-output">
+              <div><span data-i18n="harvestJumbos">عدد الجامبوهات</span><strong id="needHarvestJumbos">—</strong></div>
+              <div><span data-i18n="harvestTargetTons">إجمالي الطن المطلوب</span><strong id="needHarvestTons">— طن</strong></div>
+              <div class="total-area-result"><span data-i18n="requiredHarvestArea">مساحة الحصاد المطلوبة</span><strong id="needHarvestAreaOut">—</strong><em data-i18n="feddanUnit">فدان</em></div>
+              <div><span data-i18n="trucks">عدد السيارات</span><strong id="needTrucks">—</strong></div>
+            </div>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="designer">
+        <img src="logo.png" alt="شعار المصمم">
+        <div>
+          <strong data-i18n="designer">تصميم مهندس محمد إبراهيم (فرمينو)</strong>
+          <div data-i18n="equationFooter">جميع المعادلات مبنية على معادلة بيرو</div>
+        </div>
+      </div>
+      <div class="contact-box">
+        <a href="mailto:mohamed.ibrahim11617@gmail.com" class="contact"><span class="contact-icon mail">✉</span><span>Email</span></a>
+        <a href="tel:+201096339940" class="contact"><span class="contact-icon phone">☎</span><span data-i18n="call">اتصال</span></a>
+        <a href="https://www.linkedin.com/in/mohamed-ebrahim-771b0540a" class="contact" target="_blank" rel="noopener"><span class="contact-icon linkedin">in</span><span>LinkedIn</span></a>
+        <a href="https://www.facebook.com/share/1JHu4fGCXa/" class="contact" target="_blank" rel="noopener"><span class="contact-icon facebook">f</span><span>Facebook</span></a>
+        <a href="https://x.com/Firmo13MH" class="contact" target="_blank" rel="noopener"><span class="contact-icon xmark">𝕏</span><span>X</span></a>
+        <a href="https://wa.me/qr/QIZ446FGUAGGD1" class="contact" target="_blank" rel="noopener"><span class="contact-icon whatsapp">◔</span><span>WhatsApp</span></a>
+        <a href="https://t.me/FR6060ME" class="contact" target="_blank" rel="noopener"><span class="contact-icon telegram">➤</span><span>Telegram</span></a>
+      </div>
+      <div class="footer-note" data-i18n="contactNote">الروابط الرسمية تحاول فتح التطبيق المثبت، وإلا تفتح نسخة الويب المتاحة للخدمة.</div>
+    </footer>
+  </div>
+
+  <!-- CUSTOM BRAND MODAL/PAGE -->
+  <div class="modal-overlay" id="customOverlay" aria-hidden="true">
+    <div class="modal large-modal">
+      <div class="modal-head">
+        <div><span class="section-kicker" data-i18n="customKicker">اختيار آخر</span><h2 data-i18n="customTitle">تخصيص أطوال الأبراج أو عدد الجرر</h2></div>
+        <button class="close-modal" id="closeCustomBtn">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="custom-top">
+          <div class="form-group">
+            <label for="customName" data-i18n="customName">اسم الماركة</label>
+            <input id="customName" type="text" maxlength="40" placeholder="ماركتي">
+          </div>
+          <div class="form-group">
+            <label for="customMode" data-i18n="customMode">طريقة الإدخال</label>
+            <select id="customMode">
+              <option value="tracks" data-i18n="modeTracks">عدد الجرر</option>
+              <option value="length" data-i18n="modeLength">طول البرج (متر)</option>
+            </select>
+          </div>
+        </div>
+        <div class="custom-toolbar">
+          <button class="btn primary" id="customAutoBtn">⚡ <span data-i18n="autoFill">ملء تلقائي</span></button>
+          <button class="btn ghost" id="customClearBtn">↺ <span data-i18n="clear">مسح</span></button>
+          <span class="custom-hint" data-i18n="customHint">العجلة الأخيرة تُحسب تلقائيًا كالمتبقي.</span>
+        </div>
+        <div id="customGrid" class="custom-grid"></div>
+        <div class="custom-footer">
+          <button class="btn primary" id="saveCustomBtn">✓ <span data-i18n="saveContinue">حفظ ومتابعة</span></button>
+          <button class="btn ghost" id="cancelCustomBtn" data-i18n="cancel">إلغاء</button>
+          <button class="btn danger hidden" id="deleteCustomBtn" data-i18n="deleteBrand">حذف الماركة</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INFO MODAL -->
+  <div class="modal-overlay" id="infoOverlay" aria-hidden="true">
+    <div class="modal">
+      <div class="modal-head"><h2 id="infoTitle">تعريف بالتطبيق</h2><button class="close-modal" data-close="infoOverlay">×</button></div>
+      <div class="modal-body" id="infoBody"></div>
+    </div>
+  </div>
+
+  <!-- VERSE MODAL -->
+  <div class="modal-overlay" id="verseOverlay" aria-hidden="true">
+    <div class="modal">
+      <div class="modal-head"><h2 data-i18n="verseTitle">آية كريمة</h2><button class="close-modal" data-close="verseOverlay">×</button></div>
+      <div class="modal-body verse" dir="rtl">
+        <div class="basmala">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
+        <p>فَأَمَّا الزَّبَدُ فَيَذْهَبُ جُفَاءً ۖ وَأَمَّا مَا يَنفَعُ النَّاسَ فَيَمْكُثُ فِي الْأَرْضِ ۚ</p>
+        <small>صدق الله العظيم — سورة الرعد، الآية 17</small>
+      </div>
+    </div>
+  </div>
+
+  <script src="calc.js"></script>
+  <script src="ui.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
